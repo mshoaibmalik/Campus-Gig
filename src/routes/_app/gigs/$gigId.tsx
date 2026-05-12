@@ -31,6 +31,7 @@ interface SellerLite {
   avatar_url: string | null;
   department: string | null;
   bio: string | null;
+  university_email: string | null;
 }
 
 function GigDetail() {
@@ -50,7 +51,7 @@ function GigDetail() {
       if (g) {
         const { data: s } = await supabase
           .from("profiles")
-          .select("full_name, avatar_url, department, bio")
+          .select("full_name, avatar_url, department, bio, university_email")
           .eq("id", g.seller_id)
           .maybeSingle();
         setSeller(s as SellerLite | null);
@@ -75,7 +76,7 @@ function GigDetail() {
     return (
       <div className="rounded-2xl border border-dashed border-border p-12 text-center">
         <p className="text-muted-foreground">This gig no longer exists.</p>
-        <Link to="/gigs" className="mt-4 inline-block text-sm font-semibold text-primary hover:underline">
+        <Link to="/gigs/" className="mt-4 inline-block text-sm font-semibold text-primary hover:underline">
           Back to explore
         </Link>
       </div>
@@ -132,7 +133,18 @@ function GigDetail() {
     const { error } = await supabase.from("gigs").delete().eq("id", gig.id);
     if (error) { toast.error(error.message); return; }
     toast.success("Gig deleted");
-    navigate({ to: "/gigs" });
+    navigate({ to: "/gigs/" });
+  }
+
+  function messageSeller() {
+    const email = seller?.university_email;
+    if (!email) {
+      toast.error("Seller contact not available.");
+      return;
+    }
+    window.location.href = `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent("CampusGig inquiry about your gig")}&body=${encodeURIComponent(
+      `Hi ${seller?.full_name ?? "seller"},%0D%0A%0D%0AI'm interested in your gig titled "${gig?.title}". Please let me know if it's still available and how we can proceed.%0D%0A%0D%0AThanks!`
+    )}`;
   }
 
   return (
@@ -216,7 +228,7 @@ function GigDetail() {
               <Button size="lg" className="w-full" disabled>Unavailable</Button>
             )}
 
-            <Button variant="outline" className="w-full gap-2">
+            <Button variant="outline" className="w-full gap-2" onClick={messageSeller}>
               <MessageCircle className="h-4 w-4" /> Message seller
             </Button>
             <p className="flex items-center gap-2 pt-2 text-xs text-muted-foreground">
@@ -238,6 +250,11 @@ function GigDetail() {
               <div>
                 <p className="font-semibold">{seller?.full_name ?? "Student seller"}</p>
                 <p className="text-xs text-muted-foreground">{seller?.department ?? "—"}</p>
+                {seller?.university_email && (
+                  <a href={`mailto:${seller.university_email}`} className="mt-1 block text-xs font-medium text-primary hover:underline">
+                    {seller.university_email}
+                  </a>
+                )}
               </div>
             </div>
             {seller?.bio && <p className="mt-4 text-sm text-muted-foreground">{seller.bio}</p>}

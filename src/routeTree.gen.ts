@@ -18,7 +18,9 @@ import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
 import { Route as AppAdminRouteImport } from './routes/_app/admin'
 import { Route as AppGigsIndexRouteImport } from './routes/_app/gigs/index'
 import { Route as AppGigsNewRouteImport } from './routes/_app/gigs/new'
+import { Route as AppGigsManageRouteImport } from './routes/_app/gigs/manage'
 import { Route as AppGigsGigIdRouteImport } from './routes/_app/gigs/$gigId'
+import { Route as AppGigsGigIdEditRouteImport } from './routes/_app/gigs/$gigId/edit'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -64,10 +66,20 @@ const AppGigsNewRoute = AppGigsNewRouteImport.update({
   path: '/gigs/new',
   getParentRoute: () => AppRoute,
 } as any)
+const AppGigsManageRoute = AppGigsManageRouteImport.update({
+  id: '/gigs/manage',
+  path: '/gigs/manage',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppGigsGigIdRoute = AppGigsGigIdRouteImport.update({
   id: '/gigs/$gigId',
   path: '/gigs/$gigId',
   getParentRoute: () => AppRoute,
+} as any)
+const AppGigsGigIdEditRoute = AppGigsGigIdEditRouteImport.update({
+  id: '/edit',
+  path: '/edit',
+  getParentRoute: () => AppGigsGigIdRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -77,9 +89,11 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AppDashboardRoute
   '/profile': typeof AppProfileRoute
   '/wallet': typeof AppWalletRoute
-  '/gigs/$gigId': typeof AppGigsGigIdRoute
+  '/gigs/$gigId': typeof AppGigsGigIdRouteWithChildren
+  '/gigs/manage': typeof AppGigsManageRoute
   '/gigs/new': typeof AppGigsNewRoute
   '/gigs/': typeof AppGigsIndexRoute
+  '/gigs/$gigId/edit': typeof AppGigsGigIdEditRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -88,9 +102,11 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AppDashboardRoute
   '/profile': typeof AppProfileRoute
   '/wallet': typeof AppWalletRoute
-  '/gigs/$gigId': typeof AppGigsGigIdRoute
+  '/gigs/$gigId': typeof AppGigsGigIdRouteWithChildren
+  '/gigs/manage': typeof AppGigsManageRoute
   '/gigs/new': typeof AppGigsNewRoute
   '/gigs': typeof AppGigsIndexRoute
+  '/gigs/$gigId/edit': typeof AppGigsGigIdEditRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -101,9 +117,11 @@ export interface FileRoutesById {
   '/_app/dashboard': typeof AppDashboardRoute
   '/_app/profile': typeof AppProfileRoute
   '/_app/wallet': typeof AppWalletRoute
-  '/_app/gigs/$gigId': typeof AppGigsGigIdRoute
+  '/_app/gigs/$gigId': typeof AppGigsGigIdRouteWithChildren
+  '/_app/gigs/manage': typeof AppGigsManageRoute
   '/_app/gigs/new': typeof AppGigsNewRoute
   '/_app/gigs/': typeof AppGigsIndexRoute
+  '/_app/gigs/$gigId/edit': typeof AppGigsGigIdEditRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -115,8 +133,10 @@ export interface FileRouteTypes {
     | '/profile'
     | '/wallet'
     | '/gigs/$gigId'
+    | '/gigs/manage'
     | '/gigs/new'
     | '/gigs/'
+    | '/gigs/$gigId/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -126,8 +146,10 @@ export interface FileRouteTypes {
     | '/profile'
     | '/wallet'
     | '/gigs/$gigId'
+    | '/gigs/manage'
     | '/gigs/new'
     | '/gigs'
+    | '/gigs/$gigId/edit'
   id:
     | '__root__'
     | '/'
@@ -138,8 +160,10 @@ export interface FileRouteTypes {
     | '/_app/profile'
     | '/_app/wallet'
     | '/_app/gigs/$gigId'
+    | '/_app/gigs/manage'
     | '/_app/gigs/new'
     | '/_app/gigs/'
+    | '/_app/gigs/$gigId/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -213,6 +237,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppGigsNewRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/gigs/manage': {
+      id: '/_app/gigs/manage'
+      path: '/gigs/manage'
+      fullPath: '/gigs/manage'
+      preLoaderRoute: typeof AppGigsManageRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/gigs/$gigId': {
       id: '/_app/gigs/$gigId'
       path: '/gigs/$gigId'
@@ -220,15 +251,35 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppGigsGigIdRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/gigs/$gigId/edit': {
+      id: '/_app/gigs/$gigId/edit'
+      path: '/edit'
+      fullPath: '/gigs/$gigId/edit'
+      preLoaderRoute: typeof AppGigsGigIdEditRouteImport
+      parentRoute: typeof AppGigsGigIdRoute
+    }
   }
 }
+
+interface AppGigsGigIdRouteChildren {
+  AppGigsGigIdEditRoute: typeof AppGigsGigIdEditRoute
+}
+
+const AppGigsGigIdRouteChildren: AppGigsGigIdRouteChildren = {
+  AppGigsGigIdEditRoute: AppGigsGigIdEditRoute,
+}
+
+const AppGigsGigIdRouteWithChildren = AppGigsGigIdRoute._addFileChildren(
+  AppGigsGigIdRouteChildren,
+)
 
 interface AppRouteChildren {
   AppAdminRoute: typeof AppAdminRoute
   AppDashboardRoute: typeof AppDashboardRoute
   AppProfileRoute: typeof AppProfileRoute
   AppWalletRoute: typeof AppWalletRoute
-  AppGigsGigIdRoute: typeof AppGigsGigIdRoute
+  AppGigsGigIdRoute: typeof AppGigsGigIdRouteWithChildren
+  AppGigsManageRoute: typeof AppGigsManageRoute
   AppGigsNewRoute: typeof AppGigsNewRoute
   AppGigsIndexRoute: typeof AppGigsIndexRoute
 }
@@ -238,7 +289,8 @@ const AppRouteChildren: AppRouteChildren = {
   AppDashboardRoute: AppDashboardRoute,
   AppProfileRoute: AppProfileRoute,
   AppWalletRoute: AppWalletRoute,
-  AppGigsGigIdRoute: AppGigsGigIdRoute,
+  AppGigsGigIdRoute: AppGigsGigIdRouteWithChildren,
+  AppGigsManageRoute: AppGigsManageRoute,
   AppGigsNewRoute: AppGigsNewRoute,
   AppGigsIndexRoute: AppGigsIndexRoute,
 }
