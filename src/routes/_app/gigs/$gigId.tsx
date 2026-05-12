@@ -86,27 +86,6 @@ function GigDetail() {
   const isOwner = user?.id === gig.seller_id;
   const isBuyer = user?.id === gig.buyer_id;
 
-  async function hire() {
-    if (!user || !gig) return;
-    setBusy(true);
-    const { error: txErr } = await supabase.from("transactions").insert({
-      gig_id: gig.id,
-      buyer_id: user.id,
-      seller_id: gig.seller_id,
-      escrow_amount: gig.price,
-      status: "HELD",
-    });
-    if (txErr) { toast.error(txErr.message); setBusy(false); return; }
-    const { error: gErr } = await supabase
-      .from("gigs")
-      .update({ status: "ACTIVE", buyer_id: user.id })
-      .eq("id", gig.id);
-    setBusy(false);
-    if (gErr) { toast.error(gErr.message); return; }
-    toast.success("Gig hired — funds held in escrow.");
-    setGig({ ...gig, status: "ACTIVE", buyer_id: user.id });
-  }
-
   async function complete() {
     if (!gig) return;
     setBusy(true);
@@ -137,14 +116,7 @@ function GigDetail() {
   }
 
   function messageSeller() {
-    const email = seller?.university_email;
-    if (!email) {
-      toast.error("Seller contact not available.");
-      return;
-    }
-    window.location.href = `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent("CampusGig inquiry about your gig")}&body=${encodeURIComponent(
-      `Hi ${seller?.full_name ?? "seller"},%0D%0A%0D%0AI'm interested in your gig titled "${gig?.title}". Please let me know if it's still available and how we can proceed.%0D%0A%0D%0AThanks!`
-    )}`;
+    navigate({ to: "/messages/$sellerId", params: { sellerId: gig.seller_id } });
   }
 
   return (
@@ -219,9 +191,11 @@ function GigDetail() {
                 </Button>
               </div>
             ) : gig.status === "OPEN" ? (
-              <Button size="lg" className="w-full" onClick={hire} disabled={busy}>
-                {busy ? "Hiring…" : `Hire for $${gig.price}`}
-              </Button>
+              <Link to="/gigs/$gigId/hire" params={{ gigId }}>
+                <Button size="lg" className="w-full">
+                  Hire for ${gig.price}
+                </Button>
+              </Link>
             ) : isBuyer && gig.status === "ACTIVE" ? (
               <Button size="lg" className="w-full" onClick={complete} disabled={busy}>Release escrow</Button>
             ) : (

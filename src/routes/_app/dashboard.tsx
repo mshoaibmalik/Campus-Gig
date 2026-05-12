@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, TrendingUp, Wallet as WalletIcon, Plus, Sparkles, Pencil, Trash2 } from "lucide-react";
+import { ArrowRight, TrendingUp, Wallet as WalletIcon, Plus, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { GigCard, GigCardSkeleton, type GigCardProps } from "@/components/GigCard";
@@ -18,22 +18,13 @@ interface ProfileLite {
   balance: number;
   wallet_address: string | null;
 }
-interface OwnedGigRow {
-  id: string;
-  title: string;
-  category: string;
-  price: number;
-  delivery_days: number;
-  status: string;
-  created_at: string;
-}
 function Dashboard() {
   const { user } = useAuth();
   const [profile, setProfile] = useState<ProfileLite | null>(null);
   const [gigs, setGigs] = useState<GigCardProps[] | null>(null);
-  const [myGigs, setMyGigs] = useState<OwnedGigRow[] | null>(null);
-  const [loadingMyGigs, setLoadingMyGigs] = useState(true);
-  const [deletingGig, setDeletingGig] = useState<string | null>(null);
+  const [postedCount, setPostedCount] = useState<number | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const gigsPerPage = 8;
 
   useEffect(() => {
     if (!user) return;
@@ -53,7 +44,7 @@ function Dashboard() {
         .eq("status", "OPEN")
         .neq("seller_id", user.id)
         .order("created_at", { ascending: false })
-        .limit(12);
+        .limit(20);
       if (skills.length) q = q.overlaps("skills", skills);
       const { data } = await q;
 
@@ -68,26 +59,19 @@ function Dashboard() {
         sellerMap = new Map((sellers ?? []).map((s) => [s.id as string, s as { full_name: string | null; avatar_url: string | null }]));
       }
       setGigs(list.map((g) => ({ ...g, seller: sellerMap.get(g.seller_id) ?? null })));
+
+      const { count } = await supabase
+        .from("gigs")
+        .select("id", { count: "exact", head: true })
+        .eq("seller_id", user.id);
+      setPostedCount(count ?? 0);
     })();
   }, [user]);
 
-  useEffect(() => {
-    if (!user) return;
-    const loadMyGigs = async () => {
-      setLoadingMyGigs(true);
-      const { data } = await supabase
-        .from("gigs")
-        .select("id,title,category,price,delivery_days,status,created_at")
-        .eq("seller_id", user.id)
-        .order("created_at", { ascending: false })
-        .limit(12);
-      setMyGigs((data ?? []) as OwnedGigRow[]);
-      setLoadingMyGigs(false);
-    };
-    loadMyGigs();
-  }, [user]);
-
   const firstName = profile?.full_name?.split(" ")[0] ?? "there";
+
+  const paginatedGigs = gigs?.slice((currentPage - 1) * gigsPerPage, currentPage * gigsPerPage) || [];
+  const totalPages = Math.ceil((gigs?.length || 0) / gigsPerPage);
 
   return (
     <div className="space-y-8">
@@ -117,7 +101,7 @@ function Dashboard() {
 
           <div className="rounded-3xl border border-border bg-card p-5">
             <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Total posted gigs</p>
-            <p className="mt-3 text-4xl font-extrabold text-foreground">{myGigs?.length ?? 0}</p>
+            <p className="mt-3 text-4xl font-extrabold text-foreground">{postedCount ?? 0}</p>
             <p className="mt-1 text-sm text-muted-foreground">Your active listings</p>
           </div>
 
@@ -173,89 +157,39 @@ function Dashboard() {
         ) : gigs.length === 0 ? (
           <EmptyFeed />
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {gigs.map((g) => <GigCard key={g.id} {...g} />)}
+          <div>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {paginatedGigs.map((g) => <GigCard key={g.id} {...g} />)}
+            </div>
+            {totalPages > 1 && (
+              <div className="mt-6 flex items-center justify-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                  disabled={currentPage === 1}
+                >
+                  Previous
+                </Button>
+                <span className="text-sm text-muted-foreground">
+                  Page {currentPage} of {totalPages}
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                  disabled={currentPage === totalPages}
+                >
+                  Next
+                </Button>
+              </div>
+            )}
           </div>
         )}
       </section>
     </div>
   </div>
-
-      <section className="rounded-[2rem] border border-border bg-muted p-8 shadow-[0_30px_80px_rgba(0,0,0,0.08)]">
-        <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-          <div className="space-y-2">
-            <p className="text-sm uppercase tracking-[0.25em] text-primary/80">Your gigs</p>
-            <h2 className="text-2xl font-semibold text-foreground">Manage your posted gigs</h2>
-            <p className="max-w-2xl text-sm text-muted-foreground">
-              Edit, update, and delete your campus gig posts from one place.
-            </p>
-          </div>
-          <Link to="/gigs/new">
-            <Button size="sm" className="gap-2"><Plus className="h-4 w-4" /> Create gig</Button>
-          </Link>
-        </div>
-
-        <div className="grid gap-4">
-          {loadingMyGigs ? (
-            Array.from({ length: 3 }).map((_, index) => (
-              <div key={index} className="animate-pulse rounded-3xl border border-border bg-background p-6" />
-            ))
-          ) : myGigs && myGigs.length ? (
-            myGigs.map((gig) => (
-              <div key={gig.id} className="rounded-3xl border border-border bg-background p-6 shadow-sm">
-                <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                  <div className="space-y-2">
-                    <p className="text-sm uppercase tracking-[0.22em] text-muted-foreground">{gig.category}</p>
-                    <h3 className="text-xl font-semibold text-foreground">{gig.title}</h3>
-                    <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
-                      <span>{gig.delivery_days} day delivery</span>
-                      <span className="rounded-full border border-border bg-muted px-2 py-1">{gig.status}</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4 text-right">
-                    <div>
-                      <p className="text-sm text-muted-foreground">Price</p>
-                      <p className="text-lg font-semibold text-foreground">${gig.price}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Posted</p>
-                      <p className="text-sm text-foreground">{new Date(gig.created_at).toLocaleDateString()}</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="mt-6 flex flex-wrap items-center gap-3">
-                  <Link to="/gigs/$gigId" params={{ gigId: gig.id }} className="inline-flex items-center rounded-full border border-border bg-muted px-4 py-2 text-sm font-medium text-foreground transition hover:bg-background">
-                    View
-                  </Link>
-                  <Link to="/gigs/$gigId/edit" params={{ gigId: gig.id }} className="inline-flex items-center gap-2 rounded-full border border-border bg-white px-4 py-2 text-sm font-medium text-foreground transition hover:bg-slate-50">
-                    <Pencil className="h-4 w-4" /> Edit
-                  </Link>
-                  <Button
-                    variant="outline"
-                    className="rounded-full px-4 py-2 text-sm"
-                    onClick={async () => {
-                      if (!window.confirm("Delete this gig? This action cannot be undone.")) return;
-                      setDeletingGig(gig.id);
-                      await supabase.from("gigs").delete().eq("id", gig.id).eq("seller_id", user?.id);
-                      setDeletingGig(null);
-                      setMyGigs((prev) => prev?.filter((item) => item.id !== gig.id) ?? null);
-                    }}
-                    disabled={deletingGig === gig.id}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                    {deletingGig === gig.id ? "Deleting..." : "Delete"}
-                  </Button>
-                </div>
-              </div>
-            ))
-          ) : (
-            <div className="rounded-3xl border border-border bg-background p-8 text-center text-muted-foreground">
-              You haven’t posted any gigs yet. Create your first campus offer and start earning.
-            </div>
-          )}
-        </div>
-      </section>
-    </div>
+</div>
   );
 }
 
