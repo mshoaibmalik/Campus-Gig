@@ -1,0 +1,62 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id              String   @id @default(uuid())
+  universityEmail String   @unique
+  department      String?
+  skills          String[]
+  bio             String?
+  balance         Float    @default(0)
+  walletAddress   String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  gigsBought Gig[] @relation("GigBuyer")
+  gigsSold   Gig[] @relation("GigSeller")
+}
+
+enum GigStatus {
+  OPEN
+  ACTIVE
+  COMPLETED
+  DISPUTED
+}
+
+model Gig {
+  id          String    @id @default(uuid())
+  title       String
+  image       String?
+  description String
+  price       Float
+  category    String
+  status      GigStatus @default(OPEN)
+  
+  buyerId     String?
+  buyer       User?     @relation("GigBuyer", fields: [buyerId], references: [id])
+  
+  sellerId    String
+  seller      User      @relation("GigSeller", fields: [sellerId], references: [id])
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  transactions Transaction[]
+}
+
+model Transaction {
+  id           String   @id @default(uuid())
+  escrowAmount Float
+  timestamp    DateTime @default(now())
+
+  gigId        String
+  gig          Gig      @relation(fields: [gigId], references: [id])
+}
