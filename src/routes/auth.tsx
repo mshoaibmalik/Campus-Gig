@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { GraduationCap, Mail, Lock, ArrowRight, ShieldCheck, Eye, EyeOff } from "lucide-react";
+import { GraduationCap, Mail, Lock, ArrowRight, ShieldCheck } from "lucide-react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { UNI_EMAIL_REGEX } from "@/lib/auth-context";
@@ -21,7 +21,7 @@ const signupSchema = z.object({
     .trim()
     .email("Invalid email")
     .max(255)
-    .regex(UNI_EMAIL_REGEX, "Use your university email (.edu / .ac.xx / .edu.xx)"),
+    .regex(UNI_EMAIL_REGEX, "Use your university email (.edu / .ac.xx)"),
   password: z.string().min(6, "Min 6 characters").max(72),
 });
 
@@ -31,12 +31,11 @@ const loginSchema = z.object({
 });
 
 function AuthPage() {
-  const [mode, setMode] = useState("signup");
+  const [mode, setMode] = useState<"login" | "signup">("signup");
   const [busy, setBusy] = useState(false);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   async function onSubmit(e: React.FormEvent) {
@@ -59,12 +58,6 @@ function AuthPage() {
         });
         if (error) throw error;
         toast.success("Account created. Check your university email to verify.");
-        // Ensure verification email is sent (in case it wasn't automatically)
-        await supabase.auth.resend({
-          email: parsed.data.email,
-          type: "signup",
-          options: { emailRedirectTo: `${window.location.origin}/dashboard` },
-        });
         setMode("login");
       } else {
         const parsed = loginSchema.safeParse({ email, password });
@@ -72,19 +65,8 @@ function AuthPage() {
           toast.error(parsed.error.issues[0].message);
           return;
         }
-        const { data, error } = await supabase.auth.signInWithPassword(parsed.data);
+        const { error } = await supabase.auth.signInWithPassword(parsed.data);
         if (error) throw error;
-        if (!data?.user?.email_confirmed_at) {
-          toast.error("Please verify your email before signing in. Check your inbox for the verification link.");
-          // Resend verification email
-          await supabase.auth.resend({
-            type: "signup",
-            email: parsed.data.email,
-            options: { emailRedirectTo: `${window.location.origin}/dashboard` },
-          });
-          setBusy(false);
-          return;
-        }
         navigate({ to: "/dashboard" });
       }
     } catch (err) {
@@ -123,12 +105,12 @@ function AuthPage() {
         <div className="text-xs text-primary-foreground/60">© CampusGig</div>
       </div>
 
-            <div className="flex flex-col justify-center px-6 py-12 md:px-16 bg-card/80 backdrop-blur-xl rounded-2xl shadow-[var(--shadow-card)]">
+      <div className="flex flex-col justify-center px-6 py-12 md:px-16">
         <a href="/" className="mb-10 text-xl font-extrabold md:hidden">
           campus<span className="text-primary">gig.</span>
         </a>
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
-          <div className="mb-6 inline-flex rounded-full border border-border bg-muted p-1 text-sm shadow-lg backdrop-blur-xl">
+          <div className="mb-6 inline-flex rounded-full border border-border bg-muted p-1 text-sm">
             {(["signup", "login"] as const).map((m) => (
               <button
                 key={m}
@@ -151,9 +133,6 @@ function AuthPage() {
               ? "Sign up with your university email (.edu, .ac.xx)."
               : "Sign in to your CampusGig account."}
           </p>
-          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="mt-4 space-y-4">
-            {/* Form fields will go here */}
-          </motion.div>
 
           <form className="mt-8 space-y-4" onSubmit={onSubmit}>
             {mode === "signup" && (
@@ -195,7 +174,7 @@ function AuthPage() {
                 <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
                   id="pwd"
-                  type={showPassword ? "text" : "password"}
+                  type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
@@ -204,13 +183,6 @@ function AuthPage() {
                   maxLength={72}
                   required
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-                >
-                  {showPassword ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
-                </button>
               </div>
             </div>
 

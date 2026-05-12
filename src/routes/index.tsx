@@ -34,10 +34,10 @@ const CATEGORIES = [
 ];
 
 const SAMPLE_GIGS = [
-  { t: "I will tutor you in Calculus 201", p: 25, c: "Tutoring", g: "from-emerald-400 to-emerald-600", i: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=500&q=80", rating: 4.9, reviews: 132 },
-  { t: "I will design a clean modern logo", p: 60, c: "Design", g: "from-sky-400 to-sky-600", i: "https://images.unsplash.com/photo-1626785774573-4b799315345d?w=500&q=80", rating: 5.0, reviews: 88 },
-  { t: "I will polish your resume for SWE roles", p: 15, c: "Writing", g: "from-amber-400 to-amber-600", i: "https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=500&q=80", rating: 4.8, reviews: 211 },
-  { t: "I will help you move out this weekend", p: 40, c: "Errands", g: "from-violet-400 to-violet-600", i: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=500&q=80", rating: 4.9, reviews: 47 },
+  { t: "I will tutor you in Calculus 201", p: 25, c: "Tutoring", g: "from-emerald-400 to-emerald-600", rating: 4.9, reviews: 132 },
+  { t: "I will design a clean modern logo", p: 60, c: "Design", g: "from-sky-400 to-sky-600", rating: 5.0, reviews: 88 },
+  { t: "I will polish your resume for SWE roles", p: 15, c: "Writing", g: "from-amber-400 to-amber-600", rating: 4.8, reviews: 211 },
+  { t: "I will help you move out this weekend", p: 40, c: "Errands", g: "from-violet-400 to-violet-600", rating: 4.9, reviews: 47 },
 ];
 
 const STEPS = [
@@ -98,9 +98,18 @@ function Landing() {
 
       {/* Hero Section */}
       <section className="relative min-h-[95vh] flex items-center pt-32 pb-20 overflow-hidden">
-        {/* Banner Background */}
-        <div className="absolute inset-0 -z-20 bg-[url('/hero-banner.png')] bg-cover bg-center bg-no-repeat" />
-        <div className="absolute inset-0 -z-10 bg-background/85 backdrop-blur-md" />
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/10 via-background to-background" />
+        <motion.div 
+          animate={{ scale: [1, 1.1, 1], rotate: [0, 5, -5, 0] }} 
+          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+          className="absolute -left-40 top-20 -z-10 h-[500px] w-[500px] rounded-full bg-primary/20 blur-[100px]" 
+        />
+        <motion.div 
+          animate={{ scale: [1, 1.2, 1], rotate: [0, -10, 10, 0] }} 
+          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+          className="absolute -right-40 bottom-0 -z-10 h-[600px] w-[600px] rounded-full bg-sky-400/10 blur-[120px]" 
+        />
         
         <div className="mx-auto grid max-w-7xl gap-16 px-4 md:grid-cols-[1.1fr_1fr] md:gap-8 md:px-6">
           {/* Hero Content */}
@@ -183,9 +192,8 @@ function Landing() {
                       "bottom-10 right-10 z-10"
                     }`}
                   >
-                    <div className={`h-32 bg-gradient-to-br ${g.g} p-4 relative overflow-hidden`}>
-                      {g.i && <img src={g.i} alt={g.t} className="absolute inset-0 h-full w-full object-cover mix-blend-overlay opacity-60 transition-transform duration-500 hover:scale-110" />}
-                      <span className="absolute top-4 left-4 rounded-full bg-white/40 px-3 py-1 text-xs font-bold text-black backdrop-blur-md mix-blend-hard-light z-10 shadow-sm">
+                    <div className={`h-32 bg-gradient-to-br ${g.g} p-4 relative`}>
+                      <span className="absolute top-4 left-4 rounded-full bg-white/30 px-3 py-1 text-xs font-bold text-black backdrop-blur-md mix-blend-hard-light">
                         {g.c}
                       </span>
                     </div>
