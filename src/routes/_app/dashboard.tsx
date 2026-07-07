@@ -18,13 +18,11 @@ interface ProfileLite {
   balance: number;
   wallet_address: string | null;
 }
+
 function Dashboard() {
   const { user } = useAuth();
   const [profile, setProfile] = useState<ProfileLite | null>(null);
   const [gigs, setGigs] = useState<GigCardProps[] | null>(null);
-  const [postedCount, setPostedCount] = useState<number | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const gigsPerPage = 8;
 
   useEffect(() => {
     if (!user) return;
@@ -44,7 +42,7 @@ function Dashboard() {
         .eq("status", "OPEN")
         .neq("seller_id", user.id)
         .order("created_at", { ascending: false })
-        .limit(20);
+        .limit(12);
       if (skills.length) q = q.overlaps("skills", skills);
       const { data } = await q;
 
@@ -59,19 +57,10 @@ function Dashboard() {
         sellerMap = new Map((sellers ?? []).map((s) => [s.id as string, s as { full_name: string | null; avatar_url: string | null }]));
       }
       setGigs(list.map((g) => ({ ...g, seller: sellerMap.get(g.seller_id) ?? null })));
-
-      const { count } = await supabase
-        .from("gigs")
-        .select("id", { count: "exact", head: true })
-        .eq("seller_id", user.id);
-      setPostedCount(count ?? 0);
     })();
   }, [user]);
 
   const firstName = profile?.full_name?.split(" ")[0] ?? "there";
-
-  const paginatedGigs = gigs?.slice((currentPage - 1) * gigsPerPage, currentPage * gigsPerPage) || [];
-  const totalPages = Math.ceil((gigs?.length || 0) / gigsPerPage);
 
   return (
     <div className="space-y-8">
@@ -89,55 +78,30 @@ function Dashboard() {
         </Link>
       </motion.div>
 
-      <div className="grid gap-8 xl:grid-cols-[280px_1fr]">
-        <aside className="space-y-6 rounded-3xl border border-border bg-muted p-6 shadow-[var(--shadow-card)]">
-          <div className="space-y-3">
-            <p className="text-sm uppercase tracking-[0.25em] text-primary/80">Creator tools</p>
-            <h2 className="text-2xl font-semibold text-foreground">My gigs</h2>
-            <p className="text-sm text-muted-foreground">
-              Manage every gig you posted from one central page.
-            </p>
-          </div>
+      {/* Stats */}
+      <div className="grid gap-4 md:grid-cols-3">
+        <StatCard
+          icon={<WalletIcon className="h-5 w-5" />}
+          label="Available balance"
+          value={`$${(profile?.balance ?? 0).toFixed(2)}`}
+          accent
+        />
+        <StatCard
+          icon={<TrendingUp className="h-5 w-5" />}
+          label="Earnings (30d)"
+          value="$0.00"
+          hint="Complete your first gig to see earnings"
+        />
+        <StatCard
+          icon={<Sparkles className="h-5 w-5" />}
+          label="Your department"
+          value={profile?.department ?? "—"}
+          hint={profile?.department ? "Used for gig matching" : "Add it in your profile"}
+        />
+      </div>
 
-          <div className="rounded-3xl border border-border bg-card p-5">
-            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Total posted gigs</p>
-            <p className="mt-3 text-4xl font-extrabold text-foreground">{postedCount ?? 0}</p>
-            <p className="mt-1 text-sm text-muted-foreground">Your active listings</p>
-          </div>
-
-          <Link to="/gigs/manage" className="inline-flex w-full items-center justify-center rounded-full bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground shadow-sm transition hover:bg-primary/90">
-            Manage posted gigs
-          </Link>
-          <Link to="/gigs/new" className="inline-flex w-full items-center justify-center rounded-full border border-border bg-background px-4 py-3 text-sm font-semibold text-foreground transition hover:bg-muted">
-            Post a new gig
-          </Link>
-        </aside>
-
-        <div className="space-y-8">
-          {/* Stats */}
-          <div className="grid gap-4 md:grid-cols-3">
-            <StatCard
-              icon={<WalletIcon className="h-5 w-5" />}
-              label="Available balance"
-              value={`$${(profile?.balance ?? 0).toFixed(2)}`}
-              accent
-            />
-            <StatCard
-              icon={<TrendingUp className="h-5 w-5" />}
-              label="Earnings (30d)"
-              value="$0.00"
-              hint="Complete your first gig to see earnings"
-            />
-            <StatCard
-              icon={<Sparkles className="h-5 w-5" />}
-              label="Your department"
-              value={profile?.department ?? "—"}
-              hint={profile?.department ? "Used for gig matching" : "Add it in your profile"}
-            />
-          </div>
-
-          {/* Recommended gigs */}
-          <section>
+      {/* Recommended gigs */}
+      <section>
         <div className="mb-4 flex items-end justify-between">
           <div>
             <h2 className="text-xl font-bold md:text-2xl">Recommended for you</h2>
@@ -145,7 +109,7 @@ function Dashboard() {
               Matched to your skills{profile?.department ? ` and ${profile.department}` : ""}.
             </p>
           </div>
-          <Link to="/gigs/" className="text-sm font-semibold text-primary hover:underline">
+          <Link to="/gigs" className="text-sm font-semibold text-primary hover:underline">
             View all <ArrowRight className="-mb-0.5 inline h-4 w-4" />
           </Link>
         </div>
@@ -157,39 +121,12 @@ function Dashboard() {
         ) : gigs.length === 0 ? (
           <EmptyFeed />
         ) : (
-          <div>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {paginatedGigs.map((g) => <GigCard key={g.id} {...g} />)}
-            </div>
-            {totalPages > 1 && (
-              <div className="mt-6 flex items-center justify-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                  disabled={currentPage === 1}
-                >
-                  Previous
-                </Button>
-                <span className="text-sm text-muted-foreground">
-                  Page {currentPage} of {totalPages}
-                </span>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                  disabled={currentPage === totalPages}
-                >
-                  Next
-                </Button>
-              </div>
-            )}
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {gigs.map((g) => <GigCard key={g.id} {...g} />)}
           </div>
         )}
       </section>
     </div>
-  </div>
-</div>
   );
 }
 
@@ -228,7 +165,7 @@ function EmptyFeed() {
   return (
     <div className="rounded-2xl border border-dashed border-border p-12 text-center">
       <p className="text-sm text-muted-foreground">No matching gigs yet.</p>
-      <Link to="/gigs/" className="mt-3 inline-block text-sm font-semibold text-primary hover:underline">
+      <Link to="/gigs" className="mt-3 inline-block text-sm font-semibold text-primary hover:underline">
         Browse all gigs →
       </Link>
     </div>
