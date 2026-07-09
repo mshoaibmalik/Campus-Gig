@@ -1,17 +1,12 @@
-import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { Search } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { GigCard, GigCardSkeleton, type GigCardProps } from "@/components/GigCard";
 import { Input } from "@/components/ui/input";
 
-export const Route = createFileRoute("/_app/gigs/")({
-  component: GigsList,
-});
-
 const CATEGORIES = ["All", "Tutoring", "Design", "Coding", "Writing", "Photography", "Errands", "Music", "Video"];
 
-function GigsList() {
+export default function GigsList() {
   const [gigs, setGigs] = useState<GigCardProps[] | null>(null);
   const [cat, setCat] = useState("All");
   const [q, setQ] = useState("");

@@ -1,13 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Wallet as WalletIcon, ShieldCheck, ArrowDownToLine, ArrowUpFromLine } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { ConnectWalletModal } from "@/components/ConnectWalletModal";
-
-export const Route = createFileRoute("/_app/wallet")({
-  component: WalletPage,
-});
 
 interface Tx {
   id: string;
@@ -19,7 +14,7 @@ interface Tx {
   created_at: string;
 }
 
-function WalletPage() {
+export default function WalletPage() {
   const { user } = useAuth();
   const [balance, setBalance] = useState(0);
   const [walletAddress, setWalletAddress] = useState<string | null>(null);

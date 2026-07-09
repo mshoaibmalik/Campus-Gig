@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowLeft, Send, Mail } from "lucide-react";
@@ -9,10 +9,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/_app/messages/$sellerId")({
-  component: MessagePage,
-});
-
 interface SellerLite {
   full_name: string | null;
   avatar_url: string | null;
@@ -20,8 +16,8 @@ interface SellerLite {
   university_email: string | null;
 }
 
-function MessagePage() {
-  const { sellerId } = Route.useParams();
+export default function MessagePage() {
+  const { sellerId } = useParams<{ sellerId: string }>();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [seller, setSeller] = useState<SellerLite | null>(null);
@@ -30,6 +26,7 @@ function MessagePage() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
+    if (!sellerId) return;
     (async () => {
       setLoading(true);
       const { data } = await supabase
@@ -42,20 +39,17 @@ function MessagePage() {
     })();
   }, [sellerId]);
 
-  if (loading) {
-    return (
+  if (loading || !seller) {
+    if (loading) return (
       <div className="mx-auto max-w-2xl">
         <div className="h-8 w-1/2 animate-pulse rounded bg-muted" />
         <div className="mt-6 h-64 animate-pulse rounded-2xl bg-muted" />
       </div>
     );
-  }
-
-  if (!seller) {
     return (
       <div className="mx-auto max-w-2xl rounded-2xl border border-dashed border-border p-12 text-center">
         <p className="text-muted-foreground">Seller not found.</p>
-        <Link to="/gigs/" className="mt-4 inline-block text-sm font-semibold text-primary hover:underline">
+        <Link to="/gigs" className="mt-4 inline-block text-sm font-semibold text-primary hover:underline">
           Back to explore
         </Link>
       </div>
@@ -63,19 +57,19 @@ function MessagePage() {
   }
 
   async function sendMessage() {
-    if (!message.trim() || !seller.university_email) return;
+    if (!message.trim() || !seller?.university_email) return;
     setBusy(true);
     // Since no messaging table, use mailto for now
     const subject = "CampusGig inquiry";
-    const body = `Hi ${seller.full_name ?? "Seller"},\n\n${message}\n\nBest regards,\n${user?.email}`;
-    window.location.href = `mailto:${encodeURIComponent(seller.university_email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    const body = `Hi ${seller!.full_name ?? "Seller"},\n\n${message}\n\nBest regards,\n${user?.email}`;
+    window.location.href = `mailto:${encodeURIComponent(seller!.university_email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     toast.success("Opening email client...");
     setBusy(false);
   }
 
   return (
     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="mx-auto max-w-2xl space-y-6">
-      <Link to="/gigs/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+      <Link to="/gigs" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
         <ArrowLeft className="h-4 w-4" /> Back to explore
       </Link>
 
@@ -119,7 +113,7 @@ function MessagePage() {
         </div>
 
         <div className="mt-8 flex gap-3">
-          <Button variant="outline" className="flex-1" onClick={() => navigate({ to: "/gigs/" })}>
+          <Button variant="outline" className="flex-1" onClick={() => navigate("/gigs")}>
             Cancel
           </Button>
           <Button className="flex-1 gap-2" onClick={sendMessage} disabled={busy || !message.trim()}>

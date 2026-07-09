@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowLeft, ShieldCheck, CreditCard } from "lucide-react";
@@ -6,10 +6,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-
-export const Route = createFileRoute("/_app/gigs/$gigId/hire")({
-  component: HirePage,
-});
 
 interface Gig {
   id: string;
@@ -31,8 +27,8 @@ interface ProfileLite {
   balance: number;
 }
 
-function HirePage() {
-  const { gigId } = Route.useParams();
+export default function HirePage() {
+  const { gigId } = useParams<{ gigId: string }>();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [gig, setGig] = useState<Gig | null>(null);
@@ -41,7 +37,7 @@ function HirePage() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user || !gigId) return;
     (async () => {
       setLoading(true);
       const { data: g } = await supabase.from("gigs").select("*").eq("id", gigId).maybeSingle();
@@ -69,7 +65,7 @@ function HirePage() {
     return (
       <div className="mx-auto max-w-2xl rounded-2xl border border-dashed border-border p-12 text-center">
         <p className="text-muted-foreground">This gig is no longer available for hire.</p>
-        <Link to="/gigs/" className="mt-4 inline-block text-sm font-semibold text-primary hover:underline">
+        <Link to="/gigs" className="mt-4 inline-block text-sm font-semibold text-primary hover:underline">
           Back to explore
         </Link>
       </div>
@@ -80,7 +76,7 @@ function HirePage() {
     return (
       <div className="mx-auto max-w-2xl rounded-2xl border border-dashed border-border p-12 text-center">
         <p className="text-muted-foreground">You cannot hire your own gig.</p>
-        <Link to="/gigs/" className="mt-4 inline-block text-sm font-semibold text-primary hover:underline">
+        <Link to="/gigs" className="mt-4 inline-block text-sm font-semibold text-primary hover:underline">
           Back to explore
         </Link>
       </div>
@@ -107,12 +103,12 @@ function HirePage() {
     setBusy(false);
     if (gErr) { toast.error(gErr.message); return; }
     toast.success("Gig hired — funds held in escrow.");
-    navigate({ to: "/dashboard" });
+    navigate("/dashboard");
   }
 
   return (
     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="mx-auto max-w-2xl space-y-6">
-      <Link to="/gigs/$gigId" params={{ gigId }} className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+      <Link to={`/gigs/${gigId}`} className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
         <ArrowLeft className="h-4 w-4" /> Back to gig
       </Link>
 
@@ -167,7 +163,7 @@ function HirePage() {
         </div>
 
         <div className="mt-8 flex gap-3">
-          <Button variant="outline" className="flex-1" onClick={() => navigate({ to: "/gigs/$gigId", params: { gigId } })}>
+          <Button variant="outline" className="flex-1" onClick={() => navigate(`/gigs/${gigId}`)}>
             Cancel
           </Button>
           <Button className="flex-1 gap-2" onClick={confirmHire} disabled={busy || insufficientFunds}>

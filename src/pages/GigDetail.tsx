@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Clock, Star, ShieldCheck, MessageCircle, ArrowLeft, Trash2 } from "lucide-react";
@@ -6,10 +6,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-
-export const Route = createFileRoute("/_app/gigs/$gigId")({
-  component: GigDetail,
-});
 
 interface Gig {
   id: string;
@@ -34,8 +30,8 @@ interface SellerLite {
   university_email: string | null;
 }
 
-function GigDetail() {
-  const { gigId } = Route.useParams();
+export default function GigDetail() {
+  const { gigId } = useParams<{ gigId: string }>();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [gig, setGig] = useState<Gig | null>(null);
@@ -44,6 +40,7 @@ function GigDetail() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
+    if (!gigId) return;
     (async () => {
       setLoading(true);
       const { data: g } = await supabase.from("gigs").select("*").eq("id", gigId).maybeSingle();
@@ -60,8 +57,8 @@ function GigDetail() {
     })();
   }, [gigId]);
 
-  if (loading) {
-    return (
+  if (loading || !gig) {
+    if (loading) return (
       <div className="grid gap-8 md:grid-cols-3">
         <div className="space-y-4 md:col-span-2">
           <div className="h-72 animate-pulse rounded-2xl bg-muted" />
@@ -71,12 +68,10 @@ function GigDetail() {
         <div className="h-72 animate-pulse rounded-2xl bg-muted" />
       </div>
     );
-  }
-  if (!gig) {
     return (
       <div className="rounded-2xl border border-dashed border-border p-12 text-center">
         <p className="text-muted-foreground">This gig no longer exists.</p>
-        <Link to="/gigs/" className="mt-4 inline-block text-sm font-semibold text-primary hover:underline">
+        <Link to="/gigs" className="mt-4 inline-block text-sm font-semibold text-primary hover:underline">
           Back to explore
         </Link>
       </div>
@@ -112,11 +107,11 @@ function GigDetail() {
     const { error } = await supabase.from("gigs").delete().eq("id", gig.id);
     if (error) { toast.error(error.message); return; }
     toast.success("Gig deleted");
-    navigate({ to: "/gigs/" });
+    navigate("/gigs");
   }
 
   function messageSeller() {
-    navigate({ to: "/messages/$sellerId", params: { sellerId: gig.seller_id } });
+    if (gig) navigate(`/messages/${gig.seller_id}`);
   }
 
   return (
@@ -191,7 +186,7 @@ function GigDetail() {
                 </Button>
               </div>
             ) : gig.status === "OPEN" ? (
-              <Link to="/gigs/$gigId/hire" params={{ gigId }}>
+              <Link to={`/gigs/${gig.id}/hire`}>
                 <Button size="lg" className="w-full">
                   Hire for ${gig.price}
                 </Button>

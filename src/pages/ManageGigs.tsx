@@ -1,14 +1,10 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { ArrowLeft, Pencil, Trash2 } from "lucide-react";
-
-export const Route = createFileRoute("/_app/gigs/manage")({
-  component: ManageGigs,
-});
 
 interface ManagedGig {
   id: string;
@@ -20,7 +16,7 @@ interface ManagedGig {
   created_at: string;
 }
 
-function ManageGigs() {
+export default function ManageGigs() {
   const { user } = useAuth();
   const [gigs, setGigs] = useState<ManagedGig[] | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -37,7 +33,8 @@ function ManageGigs() {
     })();
   }, [user]);
 
-  const deleteGig = async (gigId: string) => {
+  const deleteGig = async (gigId: string | undefined) => {
+    if (!gigId) return;
     if (!confirm("Delete this gig? This action cannot be undone.")) return;
     setBusyId(gigId);
     const { error } = await supabase.from("gigs").delete().eq("id", gigId).eq("seller_id", user?.id);
@@ -96,10 +93,10 @@ function ManageGigs() {
                 <div className="flex flex-col items-start gap-3 md:items-end">
                   <p className="text-2xl font-bold">${gig.price}</p>
                   <div className="flex flex-wrap gap-2">
-                    <Link to="/gigs/$gigId" params={{ gigId: gig.id }} className="inline-flex items-center rounded-full border border-border bg-muted px-4 py-2 text-sm font-medium text-foreground transition hover:bg-background">
+                    <Link to={`/gigs/${gig.id}`} className="inline-flex items-center rounded-full border border-border bg-muted px-4 py-2 text-sm font-medium text-foreground transition hover:bg-background">
                       View
                     </Link>
-                    <Link to="/gigs/$gigId/edit" params={{ gigId: gig.id }} className="inline-flex items-center gap-2 rounded-full border border-border bg-white px-4 py-2 text-sm font-medium text-foreground transition hover:bg-slate-50">
+                    <Link to={`/gigs/${gig.id}/edit`} className="inline-flex items-center gap-2 rounded-full border border-border bg-white px-4 py-2 text-sm font-medium text-foreground transition hover:bg-slate-50">
                       <Pencil className="h-4 w-4" /> Edit
                     </Link>
                     <Button

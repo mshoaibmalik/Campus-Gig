@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Star, Clock } from "lucide-react";
 
@@ -19,8 +19,7 @@ export function GigCard(g: GigCardProps) {
       transition={{ type: "spring", stiffness: 280, damping: 22 }}
     >
       <Link
-        to="/gigs/$gigId"
-        params={{ gigId: g.id }}
+        to={`/gigs/${g.id}`}
         className="group block overflow-hidden rounded-xl border border-border bg-card shadow-[var(--shadow-card)] transition-shadow hover:shadow-[var(--shadow-card-hover)]"
       >
         <div className="relative aspect-video w-full overflow-hidden bg-muted">

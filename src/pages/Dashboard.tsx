@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, TrendingUp, Wallet as WalletIcon, Plus, Sparkles } from "lucide-react";
@@ -6,10 +6,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { GigCard, GigCardSkeleton, type GigCardProps } from "@/components/GigCard";
 import { Button } from "@/components/ui/button";
-
-export const Route = createFileRoute("/_app/dashboard")({
-  component: Dashboard,
-});
 
 interface ProfileLite {
   full_name: string | null;
@@ -19,7 +15,7 @@ interface ProfileLite {
   wallet_address: string | null;
 }
 
-function Dashboard() {
+export default function Dashboard() {
   const { user } = useAuth();
   const [profile, setProfile] = useState<ProfileLite | null>(null);
   const [gigs, setGigs] = useState<GigCardProps[] | null>(null);

@@ -1,4 +1,4 @@
-import { Link, useRouterState, Outlet } from "@tanstack/react-router";
+import { Link, useLocation, Outlet } from "react-router-dom";
 import { Home, Search, PlusCircle, Wallet, User as UserIcon, LogOut, Sparkles, Shield } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { useIsAdmin } from "@/lib/use-admin";
@@ -14,7 +14,7 @@ const NAV = [
 ];
 
 export function AppShell() {
-  const path = useRouterState({ select: (s) => s.location.pathname });
+  const path = useLocation().pathname;
   const { user, signOut } = useAuth();
   const { isAdmin } = useIsAdmin();
 

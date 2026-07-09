@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,14 +8,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { GraduationCap, Wallet, Briefcase, ShoppingCart, History, Plus } from "lucide-react";
-import { Link } from "@tanstack/react-router";
+import { GraduationCap, Wallet, Briefcase, History } from "lucide-react";
 
-export const Route = createFileRoute("/_app/profile")({
-  component: ProfilePage,
-});
-
-function ProfilePage() {
+export default function ProfilePage() {
   const { user } = useAuth();
   const [busy, setBusy] = useState(false);
   const [activeTab, setActiveTab] = useState<"profile" | "wallet" | "gigs" | "transactions">("profile");
@@ -101,13 +96,14 @@ function ProfilePage() {
 
   async function topUp() {
     const amount = parseFloat(topUpAmount);
-    if (!amount || amount <= 0) return;
+    if (!amount || amount <= 0 || !user) return;
     setBusy(true);
     const newBalance = (profile?.balance ?? 0) + amount;
+    const userId = user!.id;
     const { error } = await supabase
       .from("profiles")
       .update({ balance: newBalance })
-      .eq("id", user?.id);
+      .eq("id", userId);
     setBusy(false);
     if (error) { toast.error(error.message); return; }
     setProfile({ ...profile, balance: newBalance });
@@ -238,7 +234,7 @@ function ProfilePage() {
                       <p className="font-medium">{gig.title}</p>
                       <p className="text-sm text-muted-foreground">${gig.price} • {gig.status}</p>
                     </div>
-                    <Link to="/gigs/$gigId" params={{ gigId: gig.id }}>
+                    <Link to={`/gigs/${gig.id}`}>
                       <Button variant="outline" size="sm">View</Button>
                     </Link>
                   </div>
@@ -259,7 +255,7 @@ function ProfilePage() {
                       <p className="font-medium">{gig.title}</p>
                       <p className="text-sm text-muted-foreground">${gig.price} • {gig.status}</p>
                     </div>
-                    <Link to="/gigs/$gigId" params={{ gigId: gig.id }}>
+                    <Link to={`/gigs/${gig.id}`}>
                       <Button variant="outline" size="sm">View</Button>
                     </Link>
                   </div>

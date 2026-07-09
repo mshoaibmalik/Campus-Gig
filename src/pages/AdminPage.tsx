@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
@@ -10,10 +10,6 @@ import { useIsAdmin } from "@/lib/use-admin";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-
-export const Route = createFileRoute("/_app/admin")({
-  component: AdminPage,
-});
 
 interface ProfileRow {
   id: string;
@@ -44,7 +40,7 @@ interface TxRow {
 
 type Tab = "overview" | "users" | "gigs" | "tx";
 
-function AdminPage() {
+export default function AdminPage() {
   const { user } = useAuth();
   const { isAdmin, loading } = useIsAdmin();
   const [claiming, setClaiming] = useState(false);
@@ -358,7 +354,7 @@ function GigsTab() {
               ) : filtered.map((r) => (
                 <tr key={r.id} className="border-t border-border">
                   <td className="px-4 py-3 font-medium">
-                    <Link to="/gigs/$gigId" params={{ gigId: r.id }} className="hover:text-primary">
+                    <Link to={`/gigs/${r.id}`} className="hover:text-primary">
                       {r.title}
                     </Link>
                   </td>
@@ -421,7 +417,7 @@ function TxTab() {
               <tr key={r.id} className="border-t border-border">
                 <td className="px-4 py-3 font-mono text-xs">{r.id.slice(0, 8)}…</td>
                 <td className="px-4 py-3">
-                  <Link to="/gigs/$gigId" params={{ gigId: r.gig_id }} className="font-mono text-xs hover:text-primary">
+                  <Link to={`/gigs/${r.gig_id}`} className="font-mono text-xs hover:text-primary">
                     {r.gig_id.slice(0, 8)}…
                   </Link>
                 </td>

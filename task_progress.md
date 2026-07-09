@@ -1,0 +1,12 @@
+- [x] Read all existing source files to understand the codebase
+- [ ] Update package.json (remove TanStack Start deps, add react-router-dom)
+- [ ] Create new vite.config.ts (standard React Vite)
+- [ ] Create src/main.tsx (ReactDOM entry with BrowserRouter)
+- [ ] Create src/App.tsx (all routes defined with React Router)
+- [ ] Convert src/index.tsx → Landing page component (remove TanStack Router deps)
+- [ ] Convert src/auth.tsx → AuthPage (remove TanStack Router deps)
+- [ ] Convert src/_app layouts and all _app pages to React Router
+- [ ] Update AppShell.tsx (useLocation instead of useRouterState)
+- [ ] Delete SSR files: server.ts, start.ts, router.tsx, routeTree.gen.ts, error-page.ts, error-capture.ts
+- [ ] Install dependencies and clean up
+- [ ] Test: npm run dev, npm run build

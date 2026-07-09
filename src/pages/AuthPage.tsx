@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { GraduationCap, Mail, Lock, ArrowRight, ShieldCheck, ChevronLeft, Home } from "lucide-react";
@@ -9,10 +9,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-
-export const Route = createFileRoute("/auth")({
-  component: AuthPage,
-});
 
 const signupSchema = z.object({
   fullName: z.string().trim().min(2, "Name is too short").max(80),
@@ -30,7 +26,7 @@ const loginSchema = z.object({
   password: z.string().min(6).max(72),
 });
 
-function AuthPage() {
+export default function AuthPage() {
   const [mode, setMode] = useState<"login" | "signup">("signup");
   const [busy, setBusy] = useState(false);
   const [fullName, setFullName] = useState("");
@@ -67,7 +63,7 @@ function AuthPage() {
         }
         const { error } = await supabase.auth.signInWithPassword(parsed.data);
         if (error) throw error;
-        navigate({ to: "/dashboard" });
+        navigate("/dashboard");
       }
     } catch (err) {
       toast.error((err as Error).message);
@@ -90,7 +86,7 @@ function AuthPage() {
             <h1 className="mt-2 text-3xl font-black tracking-tight text-foreground sm:text-4xl">Verified campus marketplace for gigs</h1>
           </div>
           <button
-            onClick={() => navigate({ to: "/" })}
+            onClick={() => navigate("/")}
             className="inline-flex items-center justify-center gap-2 rounded-full border border-border/80 bg-background px-4 py-2 text-sm font-medium text-foreground shadow-sm transition hover:border-primary hover:text-primary"
           >
             <Home className="h-4 w-4" />
@@ -140,7 +136,7 @@ function AuthPage() {
               <div className="mb-6">
                 <Button
                   variant="ghost"
-                  onClick={() => navigate({ to: "/" })}
+                  onClick={() => navigate("/")}
                   className="mb-4 gap-2 text-muted-foreground hover:text-foreground"
                 >
                   <ChevronLeft className="h-4 w-4" />

@@ -1,4 +1,4 @@
-import { createFileRoute, Link, redirect } from "@tanstack/react-router";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   GraduationCap, ShieldCheck, Wallet, Sparkles, ArrowRight, Search,
@@ -6,15 +6,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-
-export const Route = createFileRoute("/")({
-  beforeLoad: async () => {
-    if (typeof window === "undefined") return;
-    const { data } = await supabase.auth.getSession();
-    if (data.session) throw redirect({ to: "/dashboard" });
-  },
-  component: Landing,
-});
+import { useEffect } from "react";
 
 const FEATURES = [
   { icon: GraduationCap, title: "Verified students only", body: "Sign-ups are gated by your university email — no random strangers." },
@@ -64,7 +56,16 @@ const FadeIn = ({ children, delay = 0, className = "" }: { children: React.React
   </motion.div>
 );
 
-function Landing() {
+export default function Landing() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase.auth.getSession();
+      if (data.session) navigate("/dashboard", { replace: true });
+    })();
+  }, [navigate]);
+
   return (
     <div className="min-h-screen bg-background selection:bg-primary/30 text-foreground overflow-x-hidden">
       {/* Floating Header */}
@@ -148,7 +149,7 @@ function Landing() {
             <motion.form
               initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.3 }}
               className="mt-10 flex w-full max-w-xl items-center gap-3 rounded-full border border-border/50 bg-background/50 p-2 shadow-xl backdrop-blur-xl focus-within:border-primary/50 focus-within:ring-4 focus-within:ring-primary/10 transition-all"
-              onSubmit={(e) => { e.preventDefault(); window.location.href = "/auth"; }}
+              onSubmit={(e) => { e.preventDefault(); navigate("/auth"); }}
             >
               <Search className="ml-4 h-6 w-6 text-primary shrink-0" />
               <input
