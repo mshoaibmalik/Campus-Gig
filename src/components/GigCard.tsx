@@ -20,22 +20,22 @@ export function GigCard(g: GigCardProps) {
     >
       <Link
         to={`/gigs/${g.id}`}
-        className="group block overflow-hidden rounded-xl border border-border bg-card shadow-[var(--shadow-card)] transition-shadow hover:shadow-[var(--shadow-card-hover)]"
+        className="group block overflow-hidden rounded-2xl border border-border bg-card shadow-soft transition-all hover:-translate-y-0.5 hover:shadow-[var(--shadow-card-hover)]"
       >
         <div className="relative aspect-video w-full overflow-hidden bg-muted">
           {g.image_url ? (
             <img
               src={g.image_url}
               alt={g.title}
-              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
               loading="lazy"
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center bg-[var(--gradient-hero)] text-primary-foreground">
-              <span className="text-2xl font-bold opacity-90">{g.title.slice(0, 2).toUpperCase()}</span>
+            <div className="flex h-full w-full items-center justify-center bg-[var(--gradient-hero)] text-foreground">
+              <span className="text-2xl font-semibold tracking-tight">{g.title.slice(0, 2).toUpperCase()}</span>
             </div>
           )}
-          <span className="absolute left-3 top-3 rounded-full bg-background/90 px-2.5 py-0.5 text-[11px] font-semibold text-foreground shadow-sm backdrop-blur">
+          <span className="absolute left-3 top-3 rounded-full bg-background/90 px-2.5 py-0.5 text-[11px] font-medium text-foreground shadow-sm backdrop-blur">
             {g.category}
           </span>
         </div>

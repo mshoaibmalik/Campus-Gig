@@ -1,18 +1,12 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Macondo&display=swap");
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
-/*
- * CampusGig design system — Fiverr-inspired.
- * Primary green #1DBF73, neutral surfaces, Inter typography.
- */
-
 @theme inline {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Macondo", "Inter", serif;
+  --font-sans: "Inter", "Segoe UI", sans-serif;
+  --font-display: "Inter", "Segoe UI", sans-serif;
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -45,71 +39,70 @@
   --color-ring: var(--ring);
   --color-ring-offset-background: var(--background);
 
-  --shadow-card: 0 1px 2px oklch(0 0 0 / 0.04), 0 4px 16px oklch(0 0 0 / 0.06);
-  --shadow-card-hover: 0 4px 12px oklch(0 0 0 / 0.06), 0 16px 32px oklch(0 0 0 / 0.10);
-  --shadow-glow: 0 8px 32px oklch(0.72 0.18 155 / 0.30);
+  --shadow-card: 0 10px 30px rgba(15, 23, 42, 0.06);
+  --shadow-card-hover: 0 14px 35px rgba(15, 23, 42, 0.08);
+  --shadow-glow: 0 12px 40px rgba(28, 122, 93, 0.12);
 
-  --gradient-hero: linear-gradient(135deg, oklch(0.72 0.18 155) 0%, oklch(0.62 0.16 168) 100%);
-  --gradient-soft: linear-gradient(180deg, oklch(0.985 0.005 155) 0%, oklch(1 0 0) 100%);
+  --gradient-hero: linear-gradient(135deg, #effaf4 0%, #e8f0eb 100%);
+  --gradient-soft: linear-gradient(180deg, #faf9f6 0%, #ffffff 100%);
 }
 
 :root {
-  --radius: 0.625rem;
+  --radius: 0.8rem;
 
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.18 0.02 250);
+  --background: #f7f4ef;
+  --foreground: #171717;
 
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.18 0.02 250);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.18 0.02 250);
+  --card: #fffdfb;
+  --card-foreground: #171717;
+  --popover: #fffdfb;
+  --popover-foreground: #171717;
 
-  /* Fiverr green #1DBF73 */
-  --primary: oklch(0.72 0.18 155);
-  --primary-foreground: oklch(1 0 0);
+  --primary: #1f6f5a;
+  --primary-foreground: #ffffff;
 
-  --secondary: oklch(0.97 0.01 250);
-  --secondary-foreground: oklch(0.22 0.02 250);
+  --secondary: #f0efe9;
+  --secondary-foreground: #1f1f1f;
 
-  --muted: oklch(0.97 0.005 250);
-  --muted-foreground: oklch(0.50 0.02 250);
+  --muted: #f2efe9;
+  --muted-foreground: #655f59;
 
-  --accent: oklch(0.95 0.04 155);
-  --accent-foreground: oklch(0.32 0.10 155);
+  --accent: #edf7f2;
+  --accent-foreground: #184f3f;
 
-  --destructive: oklch(0.60 0.22 27);
-  --destructive-foreground: oklch(1 0 0);
+  --destructive: #a1423d;
+  --destructive-foreground: #ffffff;
 
-  --success: oklch(0.72 0.18 155);
-  --success-foreground: oklch(1 0 0);
-  --warning: oklch(0.78 0.16 75);
-  --warning-foreground: oklch(0.25 0.05 75);
+  --success: #1f6f5a;
+  --success-foreground: #ffffff;
+  --warning: #b97c1d;
+  --warning-foreground: #ffffff;
 
-  --border: oklch(0.92 0.005 250);
-  --input: oklch(0.92 0.005 250);
-  --ring: oklch(0.72 0.18 155);
+  --border: #e4dfd7;
+  --input: #f5f1eb;
+  --ring: #1f6f5a;
 }
 
 .dark {
-  --background: oklch(0.16 0.02 250);
-  --foreground: oklch(0.97 0.005 250);
-  --card: oklch(0.20 0.02 250);
-  --card-foreground: oklch(0.97 0.005 250);
-  --popover: oklch(0.20 0.02 250);
-  --popover-foreground: oklch(0.97 0.005 250);
-  --primary: oklch(0.74 0.18 155);
-  --primary-foreground: oklch(0.12 0.02 250);
-  --secondary: oklch(0.26 0.02 250);
-  --secondary-foreground: oklch(0.97 0.005 250);
-  --muted: oklch(0.26 0.02 250);
-  --muted-foreground: oklch(0.70 0.02 250);
-  --accent: oklch(0.30 0.06 155);
-  --accent-foreground: oklch(0.92 0.05 155);
-  --destructive: oklch(0.65 0.20 27);
-  --destructive-foreground: oklch(1 0 0);
-  --border: oklch(1 0 0 / 0.08);
-  --input: oklch(1 0 0 / 0.12);
-  --ring: oklch(0.74 0.18 155);
+  --background: #111111;
+  --foreground: #f3f3f0;
+  --card: #191919;
+  --card-foreground: #f3f3f0;
+  --popover: #191919;
+  --popover-foreground: #f3f3f0;
+  --primary: #83d9b0;
+  --primary-foreground: #111111;
+  --secondary: #222222;
+  --secondary-foreground: #f3f3f0;
+  --muted: #1f1f1f;
+  --muted-foreground: #b5b0aa;
+  --accent: #1d352e;
+  --accent-foreground: #dff8ed;
+  --destructive: #e28d85;
+  --destructive-foreground: #111111;
+  --border: rgba(255, 255, 255, 0.09);
+  --input: rgba(255, 255, 255, 0.08);
+  --ring: #83d9b0;
 }
 
 @layer base {
@@ -118,19 +111,27 @@
   body {
     min-height: 100vh;
     background-color: var(--color-background);
-    background-image:
-      radial-gradient(circle at top left, rgba(29,191,115,0.14), transparent 28%),
-      radial-gradient(circle at bottom right, rgba(56,189,248,0.08), transparent 25%);
     color: var(--color-foreground);
     -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
   body::selection {
-    background: rgba(29,191,115,0.18);
+    background: rgba(31, 111, 90, 0.12);
     color: var(--color-foreground);
   }
   button, input, textarea, select {
     transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease,
       box-shadow 0.2s ease, transform 0.2s ease;
   }
-  h1, h2, h3, h4 { letter-spacing: -0.02em; font-weight: 700; }
+  h1, h2, h3, h4 {
+    letter-spacing: -0.04em;
+    font-weight: 700;
+    color: var(--color-foreground);
+  }
+}
+
+@layer utilities {
+  .shadow-soft {
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+  }
 }

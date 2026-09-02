@@ -101,7 +101,7 @@ export default function AuthPage() {
                 <span className="inline-flex rounded-full bg-white/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.3em] text-primary-foreground shadow-sm backdrop-blur-md">
                   Trusted campus marketplace
                 </span>
-                <h2 className="mt-8 text-5xl font-black leading-tight">Launch your campus career faster.</h2>
+                <h2 className="mt-8 text-5xl text-white leading-tight">Launch your campus career faster.</h2>
                 <p className="mt-6 max-w-xl text-base leading-8 text-primary-foreground/80">
                   Join verified students, post gigs, hire trusted classmates, and manage every payment safely with escrow.
                 </p>
@@ -123,12 +123,12 @@ export default function AuthPage() {
               </div>
             </div>
 
-            <div className="grid gap-4 rounded-[2rem] border border-white/10 bg-white/10 p-6 text-sm text-primary-foreground/90 shadow-inner backdrop-blur-md">
+            {/* <div className="grid gap-4 rounded-[2rem] border border-white/10 bg-white/10 p-6 text-sm text-primary-foreground/90 shadow-inner backdrop-blur-md">
               <p className="font-semibold">Ready to get started?</p>
               <p className="text-sm leading-7 text-primary-foreground/80">
                 Use your university email and password to sign in, or create a new account and start posting gigs today.
               </p>
-            </div>
+            </div> */}
           </div>
 
           <div className="flex flex-col justify-center">
@@ -184,7 +184,7 @@ export default function AuthPage() {
                         id="name"
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
-                        placeholder="Alex Rivera"
+                        placeholder="Ali"
                         className="pl-11"
                         maxLength={80}
                         required

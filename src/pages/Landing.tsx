@@ -255,7 +255,7 @@ export default function Landing() {
       </section>
 
       {/* Categories */}
-      <section id="categories" className="py-24 bg-muted/30">
+      {/* <section id="categories" className="py-24 bg-muted/30">
         <div className="mx-auto max-w-7xl px-4 md:px-6">
           <FadeIn className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
             <div className="max-w-2xl">
@@ -286,7 +286,7 @@ export default function Landing() {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* How it works */}
       <section id="how" className="py-32 overflow-hidden">
@@ -390,7 +390,7 @@ export default function Landing() {
                   </Button>
                 </Link>
                 <Link to="/auth" className="w-full sm:w-auto">
-                  <Button size="lg" variant="outline" className="w-full h-14 px-8 rounded-full text-lg font-bold border-white/20 bg-white/5 text-white hover:bg-white/10 backdrop-blur-md">
+                  <Button size="lg" variant="outline" className="w-full h-14 px-8 rounded-full text-lg font-bold border-white/20 bg-white/5 text-white hover:bg-white/10 hover:text-white backdrop-blur-md">
                     Browse Gigs
                   </Button>
                 </Link>

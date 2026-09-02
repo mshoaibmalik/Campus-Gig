@@ -80,7 +80,6 @@ export default function Dashboard() {
           icon={<WalletIcon className="h-5 w-5" />}
           label="Available balance"
           value={`$${(profile?.balance ?? 0).toFixed(2)}`}
-          accent
         />
         <StatCard
           icon={<TrendingUp className="h-5 w-5" />}

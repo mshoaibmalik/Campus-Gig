@@ -19,15 +19,15 @@ export function AppShell() {
   const { isAdmin } = useIsAdmin();
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Top nav (desktop) */}
-      <header className="sticky top-0 z-40 hidden border-b border-border bg-background/85 backdrop-blur md:block">
+    <div className="min-h-screen bg-background text-foreground">
+      <header className="sticky top-0 z-40 hidden border-b border-border bg-background/90 backdrop-blur-md md:block">
         <div className="mx-auto flex h-16 max-w-7xl items-center gap-8 px-6">
           <Link to="/dashboard" className="flex items-center gap-2">
-            <span className="text-2xl font-extrabold tracking-tight">
-              campus<span className="text-primary">gig</span><span className="text-primary">.</span>
+            <span className="text-xl font-semibold tracking-[-0.06em] text-foreground">
+              campus<span className="text-primary">gig</span>
             </span>
           </Link>
+
           <nav className="flex flex-1 items-center gap-1">
             {NAV.map((n) => {
               const active = path === n.to || (n.to !== "/dashboard" && path.startsWith(n.to));
@@ -36,8 +36,8 @@ export function AppShell() {
                   key={n.to}
                   to={n.to}
                   className={cn(
-                    "rounded-md px-3 py-2 text-sm font-medium transition-colors",
-                    active ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+                    "rounded-full px-3 py-2 text-sm font-medium transition-colors",
+                    active ? "bg-accent text-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground"
                   )}
                 >
                   {n.label}
@@ -45,49 +45,48 @@ export function AppShell() {
               );
             })}
           </nav>
+
           <div className="flex items-center gap-2">
             {isAdmin && (
               <Link
                 to="/admin"
                 className={cn(
-                  "inline-flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1.5 text-xs font-semibold transition-colors hover:border-primary",
-                  path.startsWith("/admin") ? "border-primary text-primary" : "text-foreground"
+                  "inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs font-semibold transition-colors",
+                  path.startsWith("/admin") ? "border-primary/30 bg-accent text-primary" : "text-foreground hover:bg-muted"
                 )}
               >
                 <Shield className="h-3.5 w-3.5" /> Admin
               </Link>
             )}
             <span className="hidden text-sm text-muted-foreground lg:inline">{user?.email}</span>
-            <Button variant="ghost" size="icon" onClick={() => signOut()} aria-label="Sign out">
+            <Button variant="ghost" size="icon" onClick={() => signOut()} aria-label="Sign out" className="rounded-full">
               <LogOut className="h-4 w-4" />
             </Button>
           </div>
         </div>
       </header>
 
-      {/* Mobile top */}
-      <header className="sticky top-0 z-40 flex h-14 items-center justify-between border-b border-border bg-background/90 px-4 backdrop-blur md:hidden">
-        <Link to="/dashboard" className="text-xl font-extrabold tracking-tight">
-          campus<span className="text-primary">gig.</span>
+      <header className="sticky top-0 z-40 flex h-14 items-center justify-between border-b border-border bg-background/90 px-4 backdrop-blur-md md:hidden">
+        <Link to="/dashboard" className="text-lg font-semibold tracking-[-0.06em]">
+          campus<span className="text-primary">gig</span>
         </Link>
         <div className="flex items-center gap-1">
           {isAdmin && (
-            <Link to="/admin" aria-label="Admin" className="inline-flex h-9 w-9 items-center justify-center rounded-md text-foreground hover:bg-muted">
+            <Link to="/admin" aria-label="Admin" className="inline-flex h-9 w-9 items-center justify-center rounded-full text-foreground hover:bg-muted">
               <Shield className="h-4 w-4" />
             </Link>
           )}
-          <Button variant="ghost" size="icon" onClick={() => signOut()} aria-label="Sign out">
+          <Button variant="ghost" size="icon" onClick={() => signOut()} aria-label="Sign out" className="rounded-full">
             <LogOut className="h-4 w-4" />
           </Button>
         </div>
       </header>
 
-      <main className="mx-auto max-w-7xl px-4 pb-24 pt-4 md:px-6 md:pb-10 md:pt-8">
+      <main className="mx-auto max-w-7xl px-4 pb-24 pt-5 md:px-6 md:pb-10 md:pt-8">
         <Outlet />
       </main>
 
-      {/* Bottom nav (mobile) */}
-      <nav className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t border-border bg-background/95 backdrop-blur md:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t border-border bg-background/95 backdrop-blur-md md:hidden">
         {NAV.map((n) => {
           const active = path === n.to || (n.to !== "/dashboard" && path.startsWith(n.to));
           const Icon = n.icon;
@@ -101,12 +100,7 @@ export function AppShell() {
               )}
             >
               {n.to === "/gigs/new" ? (
-                <span
-                  className={cn(
-                    "flex h-9 w-9 items-center justify-center rounded-full",
-                    "bg-primary text-primary-foreground shadow-[var(--shadow-glow)]"
-                  )}
-                >
+                <span className={cn("flex h-9 w-9 items-center justify-center rounded-full", "bg-primary text-primary-foreground shadow-soft")}>
                   <Icon className="h-5 w-5" />
                 </span>
               ) : (
